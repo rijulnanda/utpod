@@ -1,153 +1,137 @@
-#include <cstdlib>
 #include <iostream>
-#include "Song.h"
 #include "UtPod.h"
 
 using namespace std;
-      
-    //Default constructor
-    //set the memory size to MAX_MEMORY
-    UtPod::UtPod() {
+
+
+UtPod::UtPod() {
+    songs = NULL;
+    podMemSize = MAX_MEMORY;
+}
+
+UtPod::UtPod(int size) {
+
+    if (size > MAX_MEMORY) {
         podMemSize = MAX_MEMORY;
-        songs = NULL;
+    }
+    else if (size < 0) {
+        podMemSize = MAX_MEMORY;
+    }
+    else
+        podMemSize = size;
+}
+
+int UtPod::addSong(Song const &s) {
+
+    // check to see if there's enough memory to add the song
+    if (s.getSize() > getRemainingMemory()) {
+        return NO_MEMORY;           // NO_MEM = -1;
     }
 
-    //Constructor with size parameter
-    //The user of the class will pass in a size.
-    //If the size is greater than MAX_MEMORY or less than or equal to 0,
-    //set the size to MAX_MEMORY.
-    UtPod::UtPod(int size) {
-        if (size > MAX_MEMORY || size <= 0)
-            podMemSize = MAX_MEMORY;
-        else 
-            podMemSize = size;
-
-        songs = NULL;
-    }
-
-    /* FUNCTION - int addSong
-    * attempts to add a new song to the UtPod
-        o returns a 0 if successful
-        o returns -1 if not enough memory to add the song
-
-    precondition: s is a valid Song
-
-    input parms -
-
-    output parms -
-    */
-
-    int UtPod::addSong(Song const &s) {
-        SongNode* node = new SongNode;
+    else {
+        // add song to top of list
+        SongNode *node = new SongNode;
         node->s = s;
-
         node->next = songs;
         songs = node;
 
-        return 0;
+        return SUCCESS;             // SUCCESS = 0;
+    }
+}
+
+int UtPod::removeSong(Song const &s) {
+
+    // check to see if song s is even in UtPod
+    // traverse linked list, check if song is equal (bool == overwritten)
+    // if it is, then remove
+
+    SongNode *ptr = songs;      // 2 pointers to traverse
+    SongNode *prev = songs;
+
+    Song temp = s;              // to compare
+
+    while (ptr != NULL) {       // to check if s is in the middle of the linked list
+        if(ptr->s == temp) {
+            if (ptr == songs) {         // check to see if its the top of the list
+                delete(prev);
+                songs = ptr->next;
+                return SUCCESS;
+            }
+            else if (ptr != songs) {
+                delete(ptr);
+                prev->next = prev->next->next;
+                return SUCCESS;
+            }
+        }
+        prev = ptr;
+        ptr = ptr->next;
     }
 
+    return NO_MEMORY;
+}
 
-    /* FUNCTION - int removeSong
-    * attempts to remove a song from the UtPod
-    * removes the first instance of a song that is in the the UtPod multiple times
-        o returns 0 if successful
-        o returns -1 if nothing is removed
+int UtPod::getRemainingMemory() {
 
+    int sum = 0;
+    int total = 0;
+    SongNode *temp = songs;
 
-        input parms -
-
-        output parms -
-    */
-
-    int UtPod::removeSong(Song const &s) {
-
+    while (temp != NULL) {
+        sum += temp->s.getSize();
+        temp = temp->next;
     }
 
+    total = podMemSize - sum;
+    return total;
+}
 
-    /* FUNCTION - void shuffle
-    *  shuffles the songs into random order
-        o will do nothing if there are less than two songs in the current list
+void UtPod::clearMemory() {
+    // just gotta traverse with two pointers and delete
 
-        input parms -
+    SongNode *first = songs;
+    SongNode *second = first;
 
-        output parms -
-    */
-
-    void UtPod::shuffle() {
-
+    while (first != NULL) {
+        second = first->next;
+        delete(first);
+        first = second;
     }
 
+}
 
-    /* FUNCTION - void showSongList
-    * prints the current list of songs in order from first to last to standard output
-    * format - Title, Artist, size in MB (one song per line)
+void UtPod::sortSongList() {
 
-        input parms -
+}
 
-        output parms -
-    */
+void UtPod::showSongList() {
 
-    void UtPod::showSongList() {
+    if (songs == NULL) {
+        cout << "NO SONGS IN UTPOD" << endl;
+        return;
+    }
+    else {
+        SongNode *first = songs;
+        //SongNode *second = songs;
 
+        while (first != NULL) {
+            cout << first->s.getTitle() << '.' << first->s.getArtist() << '.' << first->s.getSize() << "MB" << endl;
+            first = first->next;
+        }
     }
 
+}
 
-    /* FUNCTION - void sortSongList
-    *  sorts the songs in ascending order
-        o will do nothing if there are less than two songs in the current list
+void UtPod::shuffle() {
 
-        input parms -
+    unsigned int currentTime = (unsigned)time(0);
+    srand(currentTime);
 
-        output parms -
-    */
+}
 
-    void UtPod::sortSongList() {
+UtPod::~UtPod() {
+    // same exact thing as clear memory
 
-    }
+    clearMemory();
 
-
-    /* FUNCTION - void clearMemory
-    * clears all the songs from memory
-
-        input parms -
-
-        output parms -
-    */
-    void UtPod::clearMemory() {
-
-    }
-
-
-    /* FUNCTION - int getTotalMemory
-    *  returns the total amount of memory in the UtPod
-        o will do nothing if there are less than two songs in the current list
-
-        input parms -
-
-        output parms -
-    */
-
-    int UtPod::getTotalMemory() {
-        return podMemSize;
-    }
-
-
-
-    /* FUNCTION - int getRemainingMemory
-    *  returns the amount of memory available for adding new songs
-
-        input parms -
-
-        output parms -
-    */
-
-    int UtPod::getRemainingMemory() {
-
-    }
-
-
-    UtPod::~UtPod() {
-
-    }
+}
 
