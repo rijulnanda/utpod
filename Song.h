@@ -1,50 +1,48 @@
-#ifndef SONG_H
-#define SONG_H
+//
+// Created by Rijul Nanda on 2019-03-13.
+//
 
-#include <cstdlib>
+#ifndef ASSIGNMENT5_SONG_H
+#define ASSIGNMENT5_SONG_H
+
 #include <iostream>
-#include <string>
+#include <string.h>
 
 using namespace std;
 
-class Song {
+class Song
+{
+private:
 
-    private:
-        //song size
-        int size;
+    string title;
+    string artist;
+    int size;
 
-        //song title
-        string title;
+public:
 
-        //song artist
-        string artist;
+    Song();                 // constructor
 
-    public:
-        //Default Constructor
-        Song();
+    Song(string artist, string title, int size);        // constructor
 
-        //Constructor with artist/title/size
-        Song(string artist, string title, int size);
-        
-        //get and set for title
-        string getTitle() const;
-        void setTitle(string title);
+    int getSize() const;
+    void setSize(int size);
 
-        //get and set for artist
-        string getArtist() const;
-        void setArtist(string artist);
+    string getTitle() const;
+    void setTitle(string title);
 
-        //get and set for size
-        int getSize() const;
-        void setSize(int size);
+    string getArtist() const;
+    void setArtist(string artist);
 
-        //overloading operators
-        bool operator ==(Song const &rhs);
-        bool operator >(Song const &rhs);
-        bool operator <(Song const &rhs);
+    void swap(Song &s);
 
-        //destructor
-        ~Song();
+    //~Song();                // destructor
+
+
+    bool operator ==(Song const &rhs);
+    bool operator >(Song const &rhs);
+    bool operator <(Song const &rhs);
+
 };
 
-#endif
+
+#endif //ASSIGNMENT5_SONG_H

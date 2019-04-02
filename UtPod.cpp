@@ -1,5 +1,7 @@
 #include <iostream>
 #include "UtPod.h"
+#include "Song.h"
+#include <cstdlib>
 
 using namespace std;
 
@@ -7,6 +9,10 @@ using namespace std;
 UtPod::UtPod() {
     songs = NULL;
     podMemSize = MAX_MEMORY;
+
+    unsigned int currentTime = (unsigned)time(0);
+    srand(currentTime);
+
 }
 
 UtPod::UtPod(int size) {
@@ -19,6 +25,10 @@ UtPod::UtPod(int size) {
     }
     else
         podMemSize = size;
+
+    unsigned int currentTime = (unsigned)time(0);
+    srand(currentTime);
+
 }
 
 int UtPod::addSong(Song const &s) {
@@ -101,6 +111,34 @@ void UtPod::clearMemory() {
 
 void UtPod::sortSongList() {
 
+    //check if two or more songs
+    if (songs != NULL && songs->next != NULL) {
+
+        SongNode* head = songs;
+        SongNode* traverse = songs->next;
+
+        while (head->next != NULL) {
+            traverse = head->next;
+
+            while (traverse != NULL) {
+
+                //if one node is less
+                if (traverse->s < head->s) {
+                    //swap them
+                    Song s1(head->s.getArtist(), head->s.getTitle(), head->s.getSize());
+                    head->s.setArtist(traverse->s.getArtist());
+                    head->s.setTitle(traverse->s.getTitle());
+                    head->s.setSize(traverse->s.getSize());
+                    traverse->s.setArtist(s1.getArtist());
+                    traverse->s.setTitle(s1.getTitle());
+                    traverse->s.setSize(s1.getSize());
+                }
+                traverse = traverse->next;
+            }
+            head = head->next;
+        }
+    }
+
 }
 
 void UtPod::showSongList() {
@@ -114,7 +152,7 @@ void UtPod::showSongList() {
         //SongNode *second = songs;
 
         while (first != NULL) {
-            cout << first->s.getTitle() << '.' << first->s.getArtist() << '.' << first->s.getSize() << "MB" << endl;
+            cout << first->s.getTitle() << " - " << first->s.getArtist() << " - " << first->s.getSize() << "MB" << endl;
             first = first->next;
         }
     }
@@ -123,8 +161,36 @@ void UtPod::showSongList() {
 
 void UtPod::shuffle() {
 
-    unsigned int currentTime = (unsigned)time(0);
-    srand(currentTime);
+    int rand1;
+    int rand2;
+
+    SongNode *first = songs;
+    SongNode *second = songs;
+
+    int number = numSongs();
+
+    //cout << "before" << endl;
+    // loop and "shuffle" as many times as there are songs
+    for (int i = 0; i < number; i++) {
+        // get 2 pointers
+        rand1 = rand() % numSongs();
+        rand2 = rand() % numSongs();
+
+        for (int j = 0; j < rand1; j++) {
+            first = first->next;
+        }
+
+        for (int k = 0; k < rand2; k++) {
+            second = second->next;
+        }
+
+        // swap them
+
+        first->s.swap(second->s);
+        first = songs;
+        second = songs;
+        //cout << "FUCK" << endl;
+    }
 
 }
 
@@ -134,4 +200,19 @@ UtPod::~UtPod() {
     clearMemory();
 
 }
+
+int UtPod::numSongs() {
+
+    SongNode *first = songs;
+    int total = 0;
+
+    while (first != NULL) {
+        total++;
+        first = first->next;
+    }
+
+    return total;
+}
+
+
 
